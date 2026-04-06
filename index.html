@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rest Timer Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    /* =====================================================
+       DESIGN SYSTEM — NO MODIFICAR
+    ===================================================== */
+    :root {
+      --lime:     #c8ff00;
+      --lime-dim: #a3d100;
+      --dark:     #0e0e0e;
+      --card:     #161616;
+      --card2:    #1e1e1e;
+      --border:   #2a2a2a;
+      --red:      #ff3b30;
+      --text:     #f0f0f0;
+      --muted:    #888888;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      background-image:
+        repeating-linear-gradient(0deg,  transparent, transparent 39px, #1a1a1a 39px, #1a1a1a 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, #1a1a1a 39px, #1a1a1a 40px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 30px 16px 50px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .phone {
+      width: 360px;
+      background: var(--card);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 0 1px #222;
+      position: relative;
+    }
+
+    /* BANNER */
+    .banner {
+      background: var(--lime);
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .banner h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: #0e0e0e;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .banner p {
+      font-size: 11px;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .banner-icon {
+      margin-left: auto;
+      font-size: 28px;
+      animation: pulse-icon 2s infinite;
+      display: flex;
+      align-items: center;
+    }
+    @keyframes pulse-icon {
+      0%,100% { transform: scale(1) rotate(0deg); }
+      50%      { transform: scale(1.15) rotate(-8deg); }
+    }
+
+    /* BODY */
+    .body { padding: 20px; }
+
+    /* INPUTS */
+    input, select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 500;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200,255,0,0.1);
+    }
+    input.invalid {
+      border-color: var(--red);
+      animation: shake 0.4s ease;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input::placeholder { color: #444; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
+    /* FIELD LABEL */
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 5px;
+      display: block;
+    }
+    .field-hint {
+      margin: 8px 0 0;
+      padding: 8px 10px;
+      background: #151515;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      line-height: 1.55;
+      color: #9a9a9a;
+    }
+    .field-hint strong { color: var(--lime); font-weight: 600; }
+
+    /* TOOLTIP */
+    .tooltip-icon {
+      display: inline-block;
+      width: 14px; height: 14px;
+      background: #333;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 9px;
+      line-height: 14px;
+      color: #aaa;
+      cursor: help;
+      margin-left: 4px;
+      vertical-align: middle;
+      position: relative;
+    }
+    .tooltip-icon:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%; bottom: 120%;
+      transform: translateX(-50%);
+      background: #222;
+      border: 1px solid #333;
+      color: #ccc;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      white-space: pre;
+      z-index: 10;
+      pointer-events: none;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    /* ROW */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* SELECT WRAP */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--lime);
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    /* TOGGLE GROUP */
+    .option-btns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .opt-btn {
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card2);
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .opt-btn .opt-icon {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+    .opt-btn:hover  { border-color: #444; color: #ccc; }
+    .opt-btn.active { border-color: var(--lime); background: rgba(200,255,0,0.08); color: var(--lime); }
+
+    /* CTA */
+    .calc-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      background: var(--lime);
+      color: #0e0e0e;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      box-shadow: 0 4px 20px rgba(200,255,0,0.25);
+      margin-top: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .calc-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    }
+    .calc-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(200,255,0,0.35); }
+    .calc-btn:active { transform: scale(0.97); }
+    .calc-btn.loading { background: #8ab500; pointer-events: none; }
+
+    /* INSTRUCCIONES */
+    .instrucciones {
+      background: #111;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--lime);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+    }
+    .instrucciones summary {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer; user-select: none;
+      list-style: none;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .instrucciones summary::-webkit-details-marker { display: none; }
+    .instrucciones summary::after { content: '▾'; margin-left: auto; transition: transform 0.3s; }
+    .instrucciones[open] summary::after { transform: rotate(180deg); }
+    .instrucciones ol  { margin-top: 10px; padding-left: 16px; color: var(--muted); font-size: 12.5px; line-height: 1.7; }
+    .instrucciones ol li span { color: var(--text); font-weight: 600; }
+    .instrucciones .tip {
+      margin-top: 8px; background: #1a1a1a;
+      border-radius: 8px; padding: 8px 10px;
+      font-size: 11.5px; color: #aaa;
+    }
+    .instrucciones .tip strong { color: var(--lime); }
+
+    /* ERROR */
+    .error-msg {
+      font-size: 12.5px;
+      color: var(--red);
+      font-weight: 600;
+      margin-bottom: 10px;
+      min-height: 18px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity 0.3s;
+    }
+
+    /* RESULTADO */
+    .resultado {
+      margin-top: 18px;
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+      transition: opacity 0.5s cubic-bezier(.22,1,.36,1), transform 0.5s cubic-bezier(.22,1,.36,1);
+      pointer-events: none;
+    }
+    .resultado.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .resultado-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--lime);
+      border-radius: 16px;
+      padding: 18px 16px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .resultado-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(200,255,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* HERO NUMBER */
+    .total-g {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 62px;
+      line-height: 1;
+      color: var(--lime);
+      text-shadow: 0 0 30px rgba(200,255,0,0.4);
+      transition: color 0.5s, text-shadow 0.5s;
+    }
+    .total-g.urgent {
+      color: var(--red);
+      text-shadow: 0 0 30px rgba(255,59,48,0.5);
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-box {
+      background: #0e0e0e;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 800;
+      color: var(--text);
+    }
+    .stat-lbl {
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* BADGE */
+    .mensaje-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(200,255,0,0.1);
+      border: 1px solid rgba(200,255,0,0.25);
+      border-radius: 50px;
+      padding: 7px 14px;
+      font-size: 12.5px; font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.5px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    /* FOOTER */
+    .footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px 18px;
+      border-top: 1px solid var(--border);
+    }
+    .footer a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .footer a:hover { border-color: var(--lime); transform: scale(1.1); }
+    .footer a img {
+      width: 16px; height: 16px;
+      filter: brightness(0.7);
+      transition: filter 0.2s;
+    }
+    .footer a:hover img { filter: brightness(1); }
+
+    /* CONFETTI */
+    .confetti-wrap {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; overflow: hidden; z-index: 99;
+    }
+    .confetti-piece {
+      position: absolute; width: 8px; height: 8px;
+      border-radius: 2px;
+      animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* MASCOTA */
+    .mascot-area {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+      position: relative;
+      height: 118px;
+    }
+    .mascot {
+      width: 120px;
+      height: 118px;
+      overflow: visible;
+    }
+
+    /* --- RESTING: completamente quieto, solo parpadeo suave --- */
+    .mascot.resting .eye-l,
+    .mascot.resting .eye-r {
+      animation: slow-blink 4s step-end infinite;
+    }
+    /* pequeña respiración apenas perceptible */
+    .mascot.resting .body-main {
+      animation: breathe 3s ease-in-out infinite;
+      transform-origin: 55px 62px;
+    }
+    .mascot.resting .arm-left  { animation: none; }
+    .mascot.resting .arm-right { animation: none; }
+    .mascot.resting .head      { animation: none; }
+    .mascot.resting .legs      { animation: none; }
+
+    @keyframes slow-blink {
+      0%,85%,100% { opacity: 1; }
+      90%          { opacity: 0; }
+    }
+    @keyframes breathe {
+      0%,100% { transform: scaleY(1);    }
+      50%      { transform: scaleY(1.03); }
+    }
+
+    /* --- WORKING: sentadillas --- */
+    /*
+       La sentadilla anima el cuerpo completo bajando y subiendo.
+       La cabeza se mantiene unida al cuerpo (mismo grupo body-main).
+       Los brazos se extienden al frente durante la bajada.
+    */
+    .mascot.working .body-main {
+      animation: squat-body 0.75s ease-in-out infinite alternate;
+      transform-origin: 55px 58px;
+    }
+    .mascot.working .arm-left {
+      animation: squat-arm-l 0.75s ease-in-out infinite alternate;
+      transform-origin: 34px 56px;
+    }
+    .mascot.working .arm-right {
+      animation: squat-arm-r 0.75s ease-in-out infinite alternate;
+      transform-origin: 76px 56px;
+    }
+    .mascot.working .legs {
+      animation: squat-legs 0.75s ease-in-out infinite alternate;
+      transform-origin: 55px 78px;
+    }
+    .mascot.working .head {
+      animation: squat-head 0.75s ease-in-out infinite alternate;
+      transform-origin: 55px 30px;
+    }
+    .mascot.working .eye-l,
+    .mascot.working .eye-r {
+      animation: pump-blink 1.2s step-end infinite;
+    }
+
+    /* El cuerpo baja (translateY +) y se encoge un poco (scaleY) */
+    @keyframes squat-body {
+      from { transform: translateY(0)   scaleY(1);    }
+      to   { transform: translateY(12px) scaleY(0.88); }
+    }
+    /* Brazos: extensión suave al frente al bajar */
+    @keyframes squat-arm-l {
+      from { transform: rotate(0deg);   }
+      to   { transform: rotate(18deg);  }
+    }
+    @keyframes squat-arm-r {
+      from { transform: rotate(0deg);   }
+      to   { transform: rotate(-18deg); }
+    }
+    /* Piernas: rodillas se abren / bajan */
+    @keyframes squat-legs {
+      from { transform: translateY(0)   scaleY(1);    }
+      to   { transform: translateY(10px) scaleY(0.82); }
+    }
+    /* Cabeza sigue el cuerpo */
+    @keyframes squat-head {
+      from { transform: translateY(0);  }
+      to   { transform: translateY(12px); }
+    }
+    @keyframes pump-blink {
+      0%,88%,100% { opacity: 1; }
+      93%          { opacity: 0; }
+    }
+
+    /* =====================================================
+       ESTILOS ESPECÍFICOS DE LA APP
+    ===================================================== */
+    .field-group { margin-bottom: 14px; }
+
+    /* TIMER */
+    .timer-wrap {
+      margin-top: 14px;
+      background: #0e0e0e;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .timer-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .timer-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      line-height: 1;
+      color: var(--lime);
+      text-shadow: 0 0 20px rgba(200,255,0,0.35);
+      transition: color 0.4s, text-shadow 0.4s;
+      letter-spacing: 4px;
+    }
+    .timer-display.urgent {
+      color: var(--red);
+      text-shadow: 0 0 24px rgba(255,59,48,0.55);
+      animation: pulse-urgent 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes pulse-urgent {
+      from { opacity: 1; }
+      to   { opacity: 0.65; }
+    }
+
+    /* PROGRESS BAR */
+    .progress-wrap {
+      margin: 10px 0 12px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 6px;
+      background: var(--lime);
+      transition: width 0.9s linear, background 0.4s;
+      width: 100%;
+    }
+    .progress-bar.urgent { background: var(--red); }
+
+    /* TIMER CONTROLS */
+    .timer-controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .ctrl-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card2);
+      color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ctrl-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .ctrl-btn.primary { background: rgba(200,255,0,0.1); border-color: var(--lime); color: var(--lime); }
+
+    /* DONE badge */
+    .done-badge {
+      display: none;
+      margin-top: 10px;
+      background: rgba(200,255,0,0.15);
+      border: 1px solid var(--lime);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--lime);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      animation: glow-pulse 1s ease-in-out infinite alternate;
+    }
+    .done-badge.visible { display: block; }
+    @keyframes glow-pulse {
+      from { box-shadow: 0 0 8px rgba(200,255,0,0.2); }
+      to   { box-shadow: 0 0 22px rgba(200,255,0,0.55); }
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .reset-btn:hover { border-color: var(--lime); color: var(--lime); }
+
+    .total-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="confetti-wrap" id="confettiWrap"></div>
+
+  <div class="phone">
+
+    <!-- BANNER -->
+    <div class="banner">
+      <div>
+        <h1>Rest Timer Pro</h1>
+        <p>DESCANSA · RINDE · PROGRESA</p>
+      </div>
+      <div class="banner-icon">⏱️</div>
+    </div>
+
+    <div class="body">
+
+      <!-- INSTRUCCIONES -->
+      <details class="instrucciones" open>
+        <summary>⚡ Cómo usar</summary>
+        <ol>
+          <li><span>Paso 1:</span> Selecciona el tipo de ejercicio que realizaste.</li>
+          <li><span>Paso 2:</span> Ingresa el peso usado y las repeticiones.</li>
+          <li><span>Paso 3:</span> Elige tu objetivo de entrenamiento.</li>
+          <li><span>Paso 4:</span> Presiona <strong>Iniciar Descanso</strong> y el timer arrancará automáticamente.</li>
+        </ol>
+        <div class="tip">
+          <strong>💡 Tip:</strong> Ejercicios compuestos como squat o deadlift requieren más tiempo de recuperación que los aislados.
+        </div>
+      </details>
+
+      <!-- ERROR -->
+      <div class="error-msg" id="errorMsg"></div>
+
+      <!-- EJERCICIO -->
+      <div class="field-group">
+        <label class="field-label">
+          Tipo de ejercicio
+          <span class="tooltip-icon" data-tip="Compuesto: varias articulaciones.&#10;Aislado: un músculo o articulación.&#10;Los compuestos suelen pedir más descanso.">?</span>
+        </label>
+        <div class="select-wrap">
+          <select id="ejercicio">
+            <option value="" disabled selected>Selecciona ejercicio</option>
+            <option value="compuesto">Compuesto (Bench, Squat, Deadlift)</option>
+            <option value="aislado">Aislado (Curl, Triceps, Lateral raises)</option>
+          </select>
+        </div>
+        <p class="field-hint">
+          <strong>Compuesto:</strong> implica varias articulaciones y grupos musculares a la vez (press, sentadilla, peso muerto).
+          <br>
+          <strong>Aislado:</strong> prioriza un músculo o articulación con un movimiento más local (curl, extensiones, elevaciones).
+        </p>
+      </div>
+
+      <!-- PESO + REPS -->
+      <div class="row" style="margin-bottom:14px">
+        <div>
+          <label class="field-label">
+            Peso (kg)
+            <span class="tooltip-icon" data-tip="Peso usado&#10;en la última serie">?</span>
+          </label>
+          <input type="number" id="peso" placeholder="Ej: 80" min="1" max="400">
+        </div>
+        <div>
+          <label class="field-label">
+            Repeticiones
+            <span class="tooltip-icon" data-tip="Reps realizadas">?</span>
+          </label>
+          <input type="number" id="reps" placeholder="Ej: 10" min="1" max="30">
+        </div>
+      </div>
+
+      <!-- OBJETIVO -->
+      <div class="field-group">
+        <label class="field-label">Objetivo</label>
+        <div class="option-btns">
+          <button class="opt-btn" data-val="fuerza" onclick="seleccionarOpcion(this)">
+            <span class="opt-icon">🏋️</span>Fuerza
+          </button>
+          <button class="opt-btn" data-val="hipertrofia" onclick="seleccionarOpcion(this)">
+            <span class="opt-icon">💪</span>Músculo
+          </button>
+          <button class="opt-btn" data-val="resistencia" onclick="seleccionarOpcion(this)">
+            <span class="opt-icon">⚡</span>Resistencia
+          </button>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <button class="calc-btn" id="calcBtn" onclick="calcular()">
+        ⏱️ INICIAR DESCANSO
+      </button>
+
+      <!-- RESULTADO -->
+      <div class="resultado" id="resultado">
+        <div class="resultado-card">
+
+          <!-- Mascota -->
+          <div class="mascot-area">
+            <svg class="mascot" id="mascot" viewBox="0 0 110 118" xmlns="http://www.w3.org/2000/svg">
+
+              <!-- SOMBRA SUELO -->
+              <ellipse cx="55" cy="115" rx="26" ry="4" fill="#0a0a0a" opacity="0.55"/>
+
+              <!-- PIERNAS (grupo independiente para sentadilla) -->
+              <g class="legs">
+                <!-- Muslo izquierdo — más delgado y femenino -->
+                <rect x="32" y="76" width="14" height="30" rx="7" fill="#1e1e1e" stroke="#2a2a2a" stroke-width="1"/>
+                <!-- Muslo derecho -->
+                <rect x="64" y="76" width="14" height="30" rx="7" fill="#1e1e1e" stroke="#2a2a2a" stroke-width="1"/>
+                <!-- Espinilla izquierda -->
+                <rect x="33" y="96" width="12" height="16" rx="6" fill="#2a2a2a"/>
+                <!-- Espinilla derecha -->
+                <rect x="65" y="96" width="12" height="16" rx="6" fill="#2a2a2a"/>
+                <!-- Zapatilla izquierda -->
+                <rect x="25" y="107" width="22" height="8" rx="4" fill="#c8ff00"/>
+                <rect x="25" y="107" width="9" height="8" rx="4" fill="#a3d100"/>
+                <!-- Zapatilla derecha -->
+                <rect x="63" y="107" width="22" height="8" rx="4" fill="#c8ff00"/>
+                <rect x="63" y="107" width="9" height="8" rx="4" fill="#a3d100"/>
+              </g>
+
+              <!-- CUERPO PRINCIPAL: torso + leggins -->
+              <g class="body-main">
+                <!-- Leggins (más ajustados, femeninos) -->
+                <rect x="30" y="66" width="50" height="14" rx="7" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+                <!-- Franja lateral leggins neón -->
+                <rect x="30" y="68" width="4" height="10" rx="2" fill="#c8ff00" opacity="0.35"/>
+                <rect x="76" y="68" width="4" height="10" rx="2" fill="#c8ff00" opacity="0.35"/>
+                <!-- Crop top / sports bra área (torso más estrecho arriba) -->
+                <path d="M 33 42 Q 33 38 37 37 L 73 37 Q 77 38 77 42 L 77 66 Q 77 70 73 70 L 37 70 Q 33 70 33 66 Z" fill="#c8ff00"/>
+                <!-- Detalle crop top — líneas horizontales -->
+                <line x1="33" y1="52" x2="77" y2="52" stroke="#a3d100" stroke-width="1" opacity="0.5"/>
+                <!-- Número en crop top -->
+                <text x="55" y="48" font-family="Bebas Neue, sans-serif" font-size="10" fill="#0e0e0e" text-anchor="middle" letter-spacing="1.5" font-weight="bold">GYM</text>
+                <!-- Cintura (forma más femenina) -->
+                <ellipse cx="55" cy="66" rx="20" ry="5" fill="#c8ff00"/>
+                <!-- Cuello piel -->
+                <rect x="48" y="32" width="14" height="8" rx="4" fill="#e8b98a"/>
+              </g>
+
+              <!-- BRAZO IZQUIERDO — más delgado -->
+              <g class="arm-left">
+                <rect x="18" y="40" width="16" height="24" rx="8" fill="#e8b98a" stroke="#d4a070" stroke-width="1"/>
+                <!-- Muñequera neón -->
+                <rect x="18" y="58" width="16" height="5" rx="2.5" fill="#c8ff00" opacity="0.7"/>
+                <!-- Mano -->
+                <ellipse cx="26" cy="67" rx="6.5" ry="7" fill="#d4a070"/>
+              </g>
+
+              <!-- BRAZO DERECHO — más delgado -->
+              <g class="arm-right">
+                <rect x="76" y="40" width="16" height="24" rx="8" fill="#e8b98a" stroke="#d4a070" stroke-width="1"/>
+                <!-- Muñequera neón -->
+                <rect x="76" y="58" width="16" height="5" rx="2.5" fill="#c8ff00" opacity="0.7"/>
+                <!-- Mano -->
+                <ellipse cx="84" cy="67" rx="6.5" ry="7" fill="#d4a070"/>
+              </g>
+
+              <!-- CABEZA -->
+              <g class="head">
+                <!-- Cabello corto (corona, detrás de la cabeza en el dibujo) -->
+                <!-- <path d="M 36 17 Q 36 7 55 5 Q 74 7 74 17 Q 71 13 55 12 Q 39 13 36 17 Z" fill="#3d2a1a"/> -->
+                <!-- Cabeza base -->
+                <ellipse cx="55" cy="22" rx="20" ry="19" fill="#e8b98a" stroke="#d4a070" stroke-width="1"/>
+                <!-- Frente / patilla corta -->
+                <!-- <path d="M 37 16 Q 42 11 55 10 Q 68 11 73 16 Q 69 14 55 14 Q 41 14 37 16 Z" fill="#3d2a1a"/> -->
+                <!-- Banda cabeza neón -->
+                <!-- <rect x="36" y="13" width="38" height="4.5" rx="2" fill="#c8ff00" opacity="0.9"/> -->
+                <!-- Orejas -->
+                <ellipse cx="35" cy="23" rx="3" ry="4.5" fill="#e8b98a" stroke="#d4a070" stroke-width="0.8"/>
+                <ellipse cx="75" cy="23" rx="3" ry="4.5" fill="#e8b98a" stroke="#d4a070" stroke-width="0.8"/>
+                <!-- Cejas -->
+                <path d="M 43 18.5 Q 47.5 17 52 18.5" stroke="#3d2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 58 18.5 Q 62.5 17 67 18.5" stroke="#3d2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <!-- Ojos -->
+                <ellipse class="eye-l" cx="48" cy="25" rx="4" ry="4.5" fill="white"/>
+                <ellipse class="eye-r" cx="62" cy="25" rx="4" ry="4.5" fill="white"/>
+                <circle cx="48.5" cy="25.5" r="2.4" fill="#2a1a0a"/>
+                <circle cx="62.5" cy="25.5" r="2.4" fill="#2a1a0a"/>
+                <!-- Brillito ojos -->
+                <circle cx="47.3" cy="24" r="0.9" fill="white"/>
+                <circle cx="61.3" cy="24" r="0.9" fill="white"/>
+                <!-- Nariz pequeña -->
+                <path d="M 53 31 Q 55 33 57 31" stroke="#c49060" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/>
+                <!-- Boca neutra -->
+                <path d="M 50 36 Q 55 37.5 60 36" stroke="#8a6b52" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+              </g>
+
+            </svg>
+          </div>
+
+          <!-- Hero number -->
+          <div style="text-align:center">
+            <div class="numbers">
+              <div class="total-g" id="totalG">0</div>
+              <div class="total-label">seg</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:600;letter-spacing:0.5px">
+              DESCANSO IDEAL
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+              <div class="stat-box">
+                <div class="stat-val" id="stat1">—</div>
+                <div class="stat-lbl">Intensidad</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="stat2">—</div>
+                <div class="stat-lbl">Recomendación</div>
+              </div>
+            </div>
+
+            <div class="mensaje-badge" id="mensajeBadge">—</div>
+          </div>
+
+          <!-- TIMER -->
+          <div class="timer-wrap">
+            <div class="timer-label">⏱ Tiempo restante</div>
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="progress-wrap">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="done-badge" id="doneBadge">🔥 ¡A levantar! Siguiente serie</div>
+            <div class="timer-controls">
+              <button class="ctrl-btn primary" id="pauseBtn" onclick="togglePause()">⏸ Pausar</button>
+              <button class="ctrl-btn" onclick="resetTimer()">↺ Reiniciar</button>
+            </div>
+          </div>
+
+          <button class="reset-btn" onclick="resetTimer()">↺ REINICIAR TIMER</button>
+
+        </div>
+      </div>
+
+    </div><!-- /body -->
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <a href="https://github.com/luisalejope" target="_blank" title="GitHub">
+        <img src="https://raw.githubusercontent.com/luisalejope/Images/refs/heads/main/github.png" alt="GitHub">
+      </a>
+      <a href="https://tiktok.com/@holasoyluis" target="_blank" title="TikTok">
+        <img src="https://raw.githubusercontent.com/luisalejope/Images/refs/heads/main/tiktok-icon.png" alt="TikTok">
+      </a>
+    </div>
+
+  </div><!-- /phone -->
+
+  <script>
+    /* =====================================================
+       ESTADO
+    ===================================================== */
+    let opcionSeleccionada = null;
+    let timerInterval = null;
+    let timerTotal = 0;
+    let timerRestante = 0;
+    let timerPaused = false;
+    let timerRunning = false;
+
+    /* =====================================================
+       TOGGLE OBJETIVO
+    ===================================================== */
+    function seleccionarOpcion(btn) {
+      document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      opcionSeleccionada = btn.dataset.val;
+    }
+
+    /* =====================================================
+       VALIDACIÓN
+    ===================================================== */
+    function setError(msg) {
+      document.getElementById('errorMsg').innerHTML = msg ? `⚠️ ${msg}` : '';
+    }
+
+    function shakeField(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('invalid');
+      void el.offsetWidth;
+      el.classList.add('invalid');
+      setTimeout(() => el.classList.remove('invalid'), 600);
+    }
+
+    /* =====================================================
+       COUNT-UP
+    ===================================================== */
+    function animateCount(el, target, duration = 800) {
+      const startTime = performance.now();
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * ease);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    /* =====================================================
+       CONFETTI
+    ===================================================== */
+    function lanzarConfetti() {
+      const wrap = document.getElementById('confettiWrap');
+      wrap.innerHTML = '';
+      const colors = ['#c8ff00', '#fff', '#ff3b30', '#0a84ff', '#ff9f0a'];
+      for (let i = 0; i < 48; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = '-10px';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width  = (6 + Math.random() * 8) + 'px';
+        p.style.height = (6 + Math.random() * 8) + 'px';
+        p.style.animationDuration = (1.2 + Math.random() * 1.8) + 's';
+        p.style.animationDelay = (Math.random() * 0.6) + 's';
+        p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        wrap.appendChild(p);
+      }
+      setTimeout(() => wrap.innerHTML = '', 3500);
+    }
+
+    /* =====================================================
+       SONIDO (AudioContext)
+    ===================================================== */
+    function beepFinal() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const beep = (delay) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.25);
+        };
+        beep(0);
+        beep(0.3);
+        beep(0.6);
+        setTimeout(() => ctx.close(), 2000);
+      } catch(e) {}
+    }
+
+    function vibrarFinal() {
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    /* =====================================================
+       TIMER
+    ===================================================== */
+    function formatTime(s) {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    function iniciarTimer(segundos) {
+      clearInterval(timerInterval);
+      timerTotal = segundos;
+      timerRestante = segundos;
+      timerPaused = false;
+      timerRunning = true;
+
+      const display = document.getElementById('timerDisplay');
+      const bar = document.getElementById('progressBar');
+      const doneBadge = document.getElementById('doneBadge');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const mascot = document.getElementById('mascot');
+
+      display.classList.remove('urgent');
+      bar.classList.remove('urgent');
+      doneBadge.classList.remove('visible');
+      pauseBtn.textContent = '⏸ Pausar';
+      pauseBtn.classList.add('primary');
+
+      // Estado: descansando
+      mascot.classList.remove('working', 'resting');
+      void mascot.offsetWidth;
+      mascot.classList.add('resting');
+
+      actualizarDisplay();
+
+      timerInterval = setInterval(() => {
+        if (timerPaused) return;
+        timerRestante--;
+
+        // Animación intensa en últimos 5s — mascota se agita un poco
+        if (timerRestante <= 5 && timerRestante > 0) {
+          mascot.classList.remove('resting');
+          mascot.classList.add('resting'); // sigue descansando pero puede añadirse urgencia visual
+        }
+
+        if (timerRestante <= 10) {
+          display.classList.add('urgent');
+          bar.classList.add('urgent');
+        }
+
+        actualizarDisplay();
+
+        if (timerRestante <= 0) {
+          clearInterval(timerInterval);
+          timerRunning = false;
+          display.textContent = '00:00';
+          bar.style.width = '0%';
+          doneBadge.classList.add('visible');
+          beepFinal();
+          vibrarFinal();
+          lanzarConfetti();
+          // ¡A ejercitarse! Cambiar mascota de resting → working
+          mascot.classList.remove('resting');
+          mascot.classList.add('working');
+          pauseBtn.textContent = '▶ Reanudar';
+          pauseBtn.classList.remove('primary');
+        }
+      }, 1000);
+    }
+
+    function actualizarDisplay() {
+      const display = document.getElementById('timerDisplay');
+      const bar = document.getElementById('progressBar');
+      display.textContent = formatTime(timerRestante);
+      const pct = timerTotal > 0 ? (timerRestante / timerTotal) * 100 : 0;
+      bar.style.width = pct + '%';
+    }
+
+    function togglePause() {
+      const btn = document.getElementById('pauseBtn');
+      if (!timerRunning && timerRestante === 0) return;
+      timerPaused = !timerPaused;
+      if (timerPaused) {
+        btn.textContent = '▶ Reanudar';
+        btn.classList.remove('primary');
+      } else {
+        btn.textContent = '⏸ Pausar';
+        btn.classList.add('primary');
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerPaused = false;
+      timerRestante = timerTotal;
+      const display = document.getElementById('timerDisplay');
+      const bar = document.getElementById('progressBar');
+      const doneBadge = document.getElementById('doneBadge');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const mascotEl = document.getElementById('mascot');
+      display.classList.remove('urgent');
+      bar.classList.remove('urgent');
+      doneBadge.classList.remove('visible');
+      pauseBtn.textContent = '⏸ Pausar';
+      pauseBtn.classList.add('primary');
+      // Volver a estado resting al reiniciar
+      mascotEl.classList.remove('working');
+      mascotEl.classList.add('resting');
+      if (timerTotal > 0) {
+        display.textContent = formatTime(timerTotal);
+        bar.style.width = '100%';
+        iniciarTimer(timerTotal);
+      } else {
+        display.textContent = '00:00';
+        bar.style.width = '100%';
+      }
+    }
+
+    /* =====================================================
+       MENSAJES POR OBJETIVO
+    ===================================================== */
+    const mensajes = {
+      fuerza:      ["Recupera full para levantar pesado 🏋️", "Este descanso define tu PR 🔥"],
+      hipertrofia: ["Mantén el músculo bajo tensión 💪", "Controla el pump ⚖️"],
+      resistencia: ["No te enfríes ⚡", "Sigue el ritmo 🔥"],
+    };
+
+    /* =====================================================
+       CALCULAR
+    ===================================================== */
+    function calcular() {
+      const btn = document.getElementById('calcBtn');
+      const resultado = document.getElementById('resultado');
+      const mascot = document.getElementById('mascot');
+
+      // Ocultar resultado anterior
+      resultado.classList.remove('show');
+      mascot.classList.remove('flexing', 'flexing-intense', 'resting', 'working');
+      setError('');
+
+      // Leer valores
+      const ejercicioEl = document.getElementById('ejercicio');
+      const pesoEl      = document.getElementById('peso');
+      const repsEl      = document.getElementById('reps');
+
+      const ejercicio = ejercicioEl.value;
+      const peso      = parseFloat(pesoEl.value);
+      const reps      = parseInt(repsEl.value);
+
+      // Validaciones
+      if (!ejercicio) {
+        shakeField('ejercicio');
+        setError('Selecciona el tipo de ejercicio');
+        return;
+      }
+      if (!pesoEl.value || isNaN(peso) || peso < 1 || peso > 400) {
+        shakeField('peso');
+        setError('Ingresa un peso válido (1–400 kg)');
+        return;
+      }
+      if (!repsEl.value || isNaN(reps) || reps < 1 || reps > 30) {
+        shakeField('reps');
+        setError('Reps inválidas (1–30)');
+        return;
+      }
+      if (!opcionSeleccionada) {
+        setError('Selecciona tu objetivo de entrenamiento');
+        return;
+      }
+
+      // Loading
+      btn.classList.add('loading');
+      btn.textContent = '⏳ Calculando...';
+
+      setTimeout(() => {
+        // --- LÓGICA DE CÁLCULO ---
+        // Paso 1: base por ejercicio
+        const base = ejercicio === 'compuesto' ? 120 : 60;
+
+        // Paso 2: intensidad
+        const intensidad = peso * (1 + reps / 30);
+
+        // Paso 3: ajuste por objetivo
+        const ajustes = { fuerza: 60, hipertrofia: 20, resistencia: -20 };
+        const ajuste_objetivo = ajustes[opcionSeleccionada];
+
+        // Paso 4: factor de intensidad
+        const intensidad_factor = intensidad * 0.25;
+
+        // Paso 5: descanso
+        let descanso = base + ajuste_objetivo + intensidad_factor;
+
+        // Paso 6: clamp
+        descanso = Math.max(30, Math.min(300, Math.round(descanso)));
+
+        // Stats
+        const intensidadRedondeada = Math.round(intensidad);
+        const recomendacion = intensidad > 100 ? 'Alta' : intensidad > 50 ? 'Media' : 'Baja';
+
+        // Badge mensaje aleatorio
+        const msgArr = mensajes[opcionSeleccionada];
+        const msg = msgArr[Math.floor(Math.random() * msgArr.length)];
+
+        // --- MOSTRAR ---
+        const totalEl  = document.getElementById('totalG');
+        const stat1El  = document.getElementById('stat1');
+        const stat2El  = document.getElementById('stat2');
+        const badgeEl  = document.getElementById('mensajeBadge');
+
+        stat1El.textContent = intensidadRedondeada;
+        stat2El.textContent = recomendacion;
+        badgeEl.textContent = msg;
+
+        // Reset urgency style
+        totalEl.classList.remove('urgent');
+
+        resultado.classList.add('show');
+        animateCount(totalEl, descanso, 900);
+        mascot.classList.add('resting');
+        lanzarConfetti();
+
+        // Iniciar timer
+        iniciarTimer(descanso);
+
+        // Restaurar botón
+        btn.classList.remove('loading');
+        btn.textContent = '⏱️ INICIAR DESCANSO';
+
+      }, 400);
+    }
+  </script>
+</body>
+</html>
